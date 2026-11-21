@@ -1,0 +1,82 @@
+name: Voici demo pages
+
+# Builds the same notebook as a Voici dashboard on Pyodide with three builds of voici-core, so the effect of the
+# JupyterLite updates proposed in voila-dashboards/voici#180 and #182 can be seen. Not part of Voici itself.
+on:
+  workflow_dispatch:
+  push:
+    branches: [demo]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - site: before
+            ref: ''
+            voici: 'voici-core==0.10.0'
+            core: 'jupyterlite-core>=0.7.6,<0.8'
+            kernel: 'jupyterlite-pyodide-kernel==0.7.2'
+          - site: pr-180
+            ref: 5825888a07bb4d774b927bcbb80ea7fc45d49e27
+            voici: ./voici/python/voici-core
+            core: 'jupyterlite-core>=0.7.6,<0.8'
+            kernel: 'jupyterlite-pyodide-kernel==0.7.2'
+          - site: issue-182
+            ref: f269a0ee29607a5094cec7c24843f2eaf3989c51
+            voici: ./voici/python/voici-core
+            core: 'jupyterlite-core>=0.8,<0.9'
+            kernel: 'jupyterlite-pyodide-kernel>=0.8,<0.9'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        if: matrix.ref != ''
+        with:
+          ref: ${{ matrix.ref }}
+          path: voici
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        if: matrix.ref != ''
+        with:
+          node-version: '22'
+      - name: Install
+        run: |
+          pip install "${{ matrix.core }}" "${{ matrix.kernel }}" "${{ matrix.voici }}" jupyter_server jupyterlab_server libarchive-c
+          pip list 2>/dev/null | grep -i -E 'jupyterlite|voici' | tee versions.txt
+      - name: Build the site
+        run: |
+          jupyter lite build --apps voici --contents content --output-dir "site/${{ matrix.site }}"
+          cp versions.txt "site/${{ matrix.site }}/versions.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.site }}
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: site
+          merge-multiple: true
+      - run: cp index.html site/index.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

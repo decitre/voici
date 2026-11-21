@@ -1,0 +1,13 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Voici on Pyodide: JupyterLite updates</title>
+<style>body{font:16px system-ui;max-width:52rem;margin:2rem auto;padding:0 1rem}td,th{padding:.4rem .8rem;border-bottom:1px solid #ccc;text-align:left}code{background:#eee;padding:0 .2rem}</style>
+<h1>Voici on Pyodide: JupyterLite updates</h1>
+<p>One notebook, built as a Voici dashboard on Pyodide with three builds of <code>voici-core</code>. It prints the Python version and shows a widget. Open each dashboard and wait for the kernel (a minute on first load). The exact versions of each build are in its <code>versions.txt</code>.</p>
+<table>
+<tr><th>Build</th><th>voici-core</th><th>jupyterlite-core</th><th>pyodide kernel</th><th>Expected</th></tr>
+<tr><td><a href="before/voici/render/demo.html">before</a></td><td>0.10.0 from PyPI</td><td>0.7.x</td><td>0.7.2</td><td>"No kernel available"</td></tr>
+<tr><td><a href="pr-180/voici/render/demo.html">#180</a></td><td><a href="https://github.com/voila-dashboards/voici/pull/180">PR #180</a> (JupyterLite packages 0.7.6)</td><td>0.7.x</td><td>0.7.2</td><td>works</td></tr>
+<tr><td><a href="issue-182/voici/render/demo.html">#182</a></td><td><a href="https://github.com/voila-dashboards/voici/issues/182">experimental</a> (JupyterLite 0.8)</td><td>0.8.x</td><td>0.8.x, Python 3.14</td><td>works</td></tr>
+</table>
+<p>The builds are pinned to commits of <a href="https://github.com/decitre/voici">decitre/voici</a>. Details: <a href="https://github.com/voila-dashboards/voici/pull/180">#180</a>, <a href="https://github.com/voila-dashboards/voici/issues/182">#182</a>. Not an official Voici page.</p>
