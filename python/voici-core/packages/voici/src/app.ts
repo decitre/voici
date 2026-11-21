@@ -138,7 +138,8 @@ export class VoiciApp extends VoilaApp {
           },
           -10
         );
-        this.widgetManager = widgetManager;
+        // spike: voila 0.5.13's VoilaWidgetManager adds members KernelWidgetManager lacks
+        this.widgetManager = widgetManager as any;
         if (!connection.kernel) {
           return;
         }
